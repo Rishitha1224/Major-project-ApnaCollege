@@ -61,10 +61,10 @@ app.get(
 app.post(
   "/listings",
   wrapAsync(async (req, res, next) => {
-    const newlisting = new Listing(req.body.listing);
     if (!req.body.listing) {
       throw new ExpressError(400, "Send valid data for listing");
     }
+    const newlisting = new Listing(req.body.listing);
     await newlisting.save();
     res.redirect("/listings");
   }),
@@ -116,13 +116,14 @@ app.delete(
 //   res.send("successful testing");
 // });
 
-app.all("*", (req, res, next) => {
+app.all("/{*splat}", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });
 
 app.use((err, req, res, next) => {
   let { statusCode = 500, message = "Something went wrong" } = err;
-  res.status(statusCode).send(message);
+  res.status(statusCode).render("error.ejs", { message });
+  //res.status(statusCode).send(message);
 });
 
 app.listen(8080, () => {
